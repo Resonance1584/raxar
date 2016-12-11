@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <cmath>
 #include <assert.h>
+#include <cmath>
 #include <iostream>
 
 class Vector3;
@@ -14,159 +14,144 @@ class Point3;
 class Ray3;
 class Line3;
 
-
 /*
  * Point3
  */
 
-class Point3{
+class Point3 {
 
-    double x;
-    double y;
-    double z;
+  double x;
+  double y;
+  double z;
 
-    public:
+public:
+  double getX();
+  double getY();
+  double getZ();
 
-    double getX();
-    double getY();
-    double getZ();
+  Point3() {}
 
-	Point3(){}
+  Point3(double value);
 
-    Point3(double value);
+  Point3(double xP, double yP, double zP);
 
-    Point3(double xP, double yP, double zP);
+  Point3(Vector3 vector);
 
-	Point3(Vector3 vector);
+  Point3 &operator=(Point3 rhs);
+  Point3 operator+(Vector3 rhs);
+  Vector3 operator-(Point3 rhs);
+  bool operator==(Point3 rhs);
+  bool operator!=(Point3 rhs);
 
-    Point3& operator=(Point3 rhs);
-    Point3 operator+(Vector3 rhs);
-    Vector3 operator-(Point3 rhs);
-    bool operator==(Point3 rhs);
-    bool operator!=(Point3 rhs);
-
-    //Point3 operator-(Vector3 rhs);
+  // Point3 operator-(Vector3 rhs);
 };
-
-
 
 /*
  * Vector3
  */
 
-class Vector3{
+class Vector3 {
 
-    double dirX;
-    double dirY;
-    double dirZ;
+  double dirX;
+  double dirY;
+  double dirZ;
 
+public:
+  Vector3() {}
 
-    public:
+  Vector3(double xDir, double yDir, double zDir);
+  Vector3(double value);
+  Vector3(Point3 point);
 
-	Vector3(){}
+  double getXDir();
+  double getYDir();
+  double getZDir();
 
-    Vector3(double xDir, double yDir, double zDir);
-    Vector3(double value);
-	Vector3(Point3 point);
+  bool operator==(Vector3 rhs);
+  bool operator!=(Vector3 rhs);
 
+  Vector3 &operator=(Vector3 rhs);
 
-    double getXDir();
-    double getYDir();
-    double getZDir();
+  Vector3 operator+(Vector3 rhs);
+  Vector3 operator-(Vector3 rhs);
+  Vector3 operator-(); // negation
 
-    bool operator==(Vector3 rhs);
-    bool operator!=(Vector3 rhs);
+  Vector3 operator*(double scalar);
+  Vector3 operator/(double scalar);
 
-    Vector3& operator=(Vector3 rhs);
+  Vector3 norm();
+  Vector3 unit();
 
-    Vector3 operator+(Vector3 rhs);
-    Vector3 operator-(Vector3 rhs);
-    Vector3 operator-(); //negation
-
-    Vector3 operator*(double scalar);
-    Vector3 operator/(double scalar);
-
-    Vector3 norm();
-    Vector3 unit();
-
-    double dot(Vector3 rhs);
-    Vector3 cross(Vector3 rhs);
-    double length();
+  double dot(Vector3 rhs);
+  Vector3 cross(Vector3 rhs);
+  double length();
 };
-
-
-
 
 /*
 * Ray3
 * Ray3 is defined by a starting point and a direction
 */
-class Ray3{
+class Ray3 {
 
-    //Private data
-    Point3 start;
-    Vector3 direction; //Unit vector
+  // Private data
+  Point3 start;
+  Vector3 direction; // Unit vector
 
 public:
-    /*
-     * Ray3 Constructor
-     */
-	Ray3(){}
-    Ray3(Point3 startP, Vector3 directionV);
+  /*
+   * Ray3 Constructor
+   */
+  Ray3() {}
+  Ray3(Point3 startP, Vector3 directionV);
 
-    /*
-     * Returns a Point3 on the ray at alpha*direction
-     */
-    Point3 pos(double alpha);
+  /*
+   * Returns a Point3 on the ray at alpha*direction
+   */
+  Point3 pos(double alpha);
 
-	Point3 startP(){
-		return start;
-	}
+  Point3 startP() { return start; }
 
-	Vector3 directionV(){
-		return direction;
-	}
+  Vector3 directionV() { return direction; }
 
-    /*
-     * Overidden operators
-     */
-    Ray3& operator=(Ray3 rhs);
+  /*
+   * Overidden operators
+   */
+  Ray3 &operator=(Ray3 rhs);
 
-    bool operator==(Ray3 rhs);
+  bool operator==(Ray3 rhs);
 
-    bool operator!=(Ray3 rhs);
+  bool operator!=(Ray3 rhs);
 };
-
 
 /*
  * A line is defined by two points
  */
-class Line3{
+class Line3 {
 
-    //Private data
-    Point3 p1;
-    Point3 p2;
+  // Private data
+  Point3 p1;
+  Point3 p2;
 
 public:
-    /*
-     * Line3 constructor
-     */
-	Line3(){}
-    Line3(Point3 p1, Point3 p2);
+  /*
+   * Line3 constructor
+   */
+  Line3() {}
+  Line3(Point3 p1, Point3 p2);
 
-    /*
-     * Point at position alpha on the line
-     */
-    Point3 pos(double alpha);
+  /*
+   * Point at position alpha on the line
+   */
+  Point3 pos(double alpha);
 
-    /*
-     * Overidden operators
-     */
-    Line3& operator=(Line3 rhs);
+  /*
+   * Overidden operators
+   */
+  Line3 &operator=(Line3 rhs);
 
-    bool operator==(Line3 rhs);
+  bool operator==(Line3 rhs);
 
-    bool operator!=(Line3 rhs);
+  bool operator!=(Line3 rhs);
 };
 
 /*

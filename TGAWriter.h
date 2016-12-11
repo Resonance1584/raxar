@@ -9,20 +9,19 @@ using namespace std;
 
 class TGAWriter {
 
-	int width;
-	int height;
-	float* data;
-	int currentPixel;
+  int width;
+  int height;
+  float *data;
+  int currentPixel;
 
 public:
-	TGAWriter(int nWidth, int nHeight);
+  TGAWriter(int nWidth, int nHeight);
 
-	void putNextPixel(float red, float green, float blue);
+  void putNextPixel(float red, float green, float blue);
 
-	void putNextPixel(Colour c);
+  void putNextPixel(Colour c);
 
-	bool writeImage();
+  bool writeImage();
 
-	~TGAWriter();
-
+  ~TGAWriter();
 };
