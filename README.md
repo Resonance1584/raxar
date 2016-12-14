@@ -2,6 +2,8 @@
 
 A simple ray-tracer built for a computer graphics assignment. Originally built in VCS on Windows, so some whitespace errors are still persent in port.
 
+<img src="https://cloud.githubusercontent.com/assets/1177082/21167739/ad40aff6-c202-11e6-8f45-9af7eb01d6b2.png">
+
 ## Usage
 
 Toggle AA by uncommenting #define SUPER_SAMPLE and #define JITTER_AA flags in RaXaR.cpp
