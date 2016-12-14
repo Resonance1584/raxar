@@ -5,7 +5,7 @@ OBJS = RaXaR.cpp View.cpp Shapes.cpp Illumination.cpp Colour.cpp GeomX.cpp TGARe
 CC = g++
 
 #COMPILER_FLAGS
-COMPILER_FLAGS = -pedantic -Wall -Werror -std=c++11
+COMPILER_FLAGS = -pedantic -Wall -Werror -std=c++11 -O3
 
 #OBJ_NAME
 OBJ_NAME = raxar
