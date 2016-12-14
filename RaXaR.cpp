@@ -17,8 +17,8 @@
 #include <vector>
 
 // Image size definition
-#define WIDTH 1024
-#define HEIGHT 1024
+#define WIDTH 1920
+#define HEIGHT 1080
 
 // Lighting values
 #define LIGHT_DIR unit(Vector3(1, 5, 2))
@@ -57,8 +57,8 @@
 #define REC_DEPTH 10
 
 // Antialiasing ifdef flags
-#define SUPER_SAMPLE
-#define JITTER_AA
+// #define SUPER_SAMPLE
+// #define JITTER_AA
 
 // Random generator for jitter AA (bytes.com)
 float jitRand(float min, float max) {
@@ -93,29 +93,18 @@ int main() {
   // The lights that are active on our scene
   list<Lighting *> lights;
 
-  // lights.push_back(new DirectionLight(LIGHT_INTENS, LIGHT_DIR, AMBIENT));
-  // lights.push_back(new DirectionLight(LIGHT_INTENS, LIGHT_DIR2, AMBIENT));
+  lights.push_back(new DirectionLight(LIGHT_INTENS, LIGHT_DIR2, AMBIENT));
 
   // Spotlight
   lights.push_back(
       new SpotLight(LIGHT_INTENS, LIGHT_DIR, AMBIENT, Point3(2, 4, 2), 8));
-  lights.push_back(new SpotLight(LIGHT_INTENS, unit(Vector3(0, 1, 1)), AMBIENT,
-                                 Point3(-1, 2, 2), 18));
+
   // Scene definition
   list<Shape *> scene;
 
-  scene.push_back(new Sphere(Point3(0.35, 1, -2), 0.5, SHINY_BLUE));
-  scene.push_back(new Sphere(Point3(0.75, 0.4, -1.6), 0.3, SHINY_RED));
+  scene.push_back(new Sphere(Point3(0.35, 1, -2), 0.5, SHINY_RED));
+  scene.push_back(new Sphere(Point3(0.75, 0.4, -1.6), 0.3, MATT_BLUE));
   scene.push_back(new Plane(Point3(0, 0, 0), Vector3(0, 1, 0), MATT_GRASS));
-  scene.push_back(new Triangle(Point3(1, 0, 0), Point3(2, 0, 0),
-                               Point3(1.5, 1, 0), MATT_GREEN));
-  Cube *blueCube = new Cube(Point3(-1, 0.25, -1), 0.5, MATT_BLUE);
-  blueCube->removeBackFaces(EYEPOINT);
-  scene.push_back(blueCube);
-
-  // scene.push_back(new Sphere(Point3(0.5,1,-0.25),0.25,MATT_BLUE));
-  // scene.push_back(new
-  // Triangle(Point3(-1.0,2.0,-1.5),Point3(0,0,-1.5),Point3(1.0,2.0,-2.5),MIRROR));
 
   vector<Triangle *> pyramid;
   pyramid.push_back(new Triangle(Point3(-1, 0, 0), Point3(0, 0, 1),
@@ -131,14 +120,7 @@ int main() {
   p->removeBackFaces(EYEPOINT);
   scene.push_back(p);
 
-  scene.push_back(
-      new Square(Point3(-3, 0, 0), Point3(0, 3, -3), Vector3(1, 0, 1), MIRROR));
-  scene.push_back(
-      new Square(Point3(0, 3, -3), Point3(3, 0, 0), Vector3(-1, 0, 1), MIRROR));
-
   scene.push_back(new Sphere(Point3(-1, 1, 1), 0.7, MATT_EARTH));
-
-  // scene.push_back(new Plane(Point3(0,0,0), Vector3(0,1,0), MATT_CHECK));
 
   // Camera definition
   View view = View(EYEPOINT, LOOKAT, VIEW_UP, FOV, WIDTH, HEIGHT);
@@ -198,6 +180,12 @@ int main() {
 
             // Stop this iteration if there was no intersections
             if (shape == NULL) {
+              // Sky Blue Background?
+              // Looks a bit weird as reflections still have a black sky
+              if (level == 0) {
+                colour = colour + Colour(0.529, 0.808, 0.922);
+                // TODO: Fix with AA
+              }
               break;
             }
 
@@ -304,7 +292,8 @@ int main() {
 
   // Write our image to a file
   if (imageWriter->writeImage()) {
-    return time_taken * 1000; // Return time in ms (casts to int)
+    std::cout << time_taken * 1000 << endl;
+    return 0;
   } else {
     return -1; // Error writing image
   }

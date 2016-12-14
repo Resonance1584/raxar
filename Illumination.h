@@ -10,8 +10,6 @@
 #include "TGAReader.h"
 #include "pi.h"
 
-class Shape; // legit? nope
-
 /*
  * Abstract class Lighting
  * Contains an intensity, direction and ambient
