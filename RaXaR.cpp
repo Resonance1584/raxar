@@ -180,8 +180,7 @@ int main() {
               // Sky Blue Background?
               // Looks a bit weird as reflections still have a black sky
               if (level == 0) {
-                colour = colour + Colour(0.529, 0.808, 0.922);
-                // TODO: Fix with AA
+                colour = colour + (Colour(0.529, 0.808, 0.922) * coef);
               }
               break;
             }
