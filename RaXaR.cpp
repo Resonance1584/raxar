@@ -126,16 +126,23 @@ int main() {
   View view = View(EYEPOINT, LOOKAT, VIEW_UP, FOV, WIDTH, HEIGHT);
 
   // The main loop
+  // Iterate Y axis first
   for (float y = 0.0f; y < HEIGHT; y++) {
     for (float x = 0.0f; x < WIDTH; x++) {
 
       Colour colour = Colour(0.0, 0.0, 0.0);
-#ifdef SUPER_SAMPLE
 
+#ifdef SUPER_SAMPLE
       // Allows us to increase the samples per pixel to four
       for (float fragmentx = x; fragmentx < x + 1.0f; fragmentx += 0.5f) {
         for (float fragmenty = y; fragmenty < y + 1.0f; fragmenty += 0.5f) {
           double coef = 0.25;
+#else
+          float fragmentx = x;
+          float fragmenty = y;
+          double coef = 1.0;
+#endif
+
 #ifdef JITTER_AA
           // Offset our ray so it doesnt always travel through the
           // center of the pixel / pixelfragment
@@ -144,16 +151,6 @@ int main() {
           Ray3 ray = view.createRay(rx, ry);
 #else
           Ray3 ray = view.createRay(fragmentx, fragmenty);
-#endif
-#else
-      double coef = 1.0;
-#ifdef JITTER_AA
-      float rx = x + jitRand(-0.25, 0.25);
-      float ry = y + jitRand(-0.25, 0.25);
-      Ray3 ray = view.createRay(rx, ry);
-#else
-      Ray3 ray = view.createRay(x, y);
-#endif
 #endif
 
           int level = 0; // Recursion level
