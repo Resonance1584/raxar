@@ -1,0 +1,4 @@
+raxar
+*.o
+output.tga
+.DS_Store
