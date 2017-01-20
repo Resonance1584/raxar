@@ -2,6 +2,7 @@
 
 #include "GeomX.h"
 #include "Illumination.h"
+#include "pi.h"
 #include <list>
 #include <vector>
 
@@ -22,9 +23,10 @@ public:
    */
   virtual double intersect(Ray3 r) = 0;
 
-  virtual bool isSphere() { return false; }
-
   virtual Point3 getPoint() = 0;
+
+  virtual Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                           Vector3 inverseRay, bool isShadowed) = 0;
 };
 
 /*
@@ -38,8 +40,9 @@ public:
   Sphere(Point3 centre, double radius, Material mat);
   Vector3 normal(Point3 p);
   double intersect(Ray3 r);
-  bool isSphere() { return true; }
   Point3 getPoint() { return centre; }
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
 
 /*
@@ -56,6 +59,8 @@ public:
   Vector3 normal(Point3 p);
   double intersect(Ray3 r);
   Point3 getPoint();
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
 
 /*
@@ -74,6 +79,8 @@ public:
   Vector3 normal(Point3 p);
   double intersect(Ray3 r);
   Point3 getPoint();
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
 
 /*
@@ -91,6 +98,8 @@ public:
   Vector3 normal(Point3 p);
   double intersect(Ray3 r);
   Point3 getPoint();
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
 
 /*
@@ -110,6 +119,8 @@ public:
   double intersect(Ray3 r);
   void removeBackFaces(Point3 eyePoint);
   Point3 getPoint() { return origin; }
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
 
 /*
@@ -127,39 +138,6 @@ public:
   double intersect(Ray3 r);
   void removeBackFaces(Point3 eyePoint);
   Point3 getPoint() { return Point3(0, 0, 0); }
+  Colour getColour(Point3 position, Vector3 normal, Lighting *light,
+                   Vector3 inverseRay, bool isShadowed);
 };
-
-/*
-        This code can create a cube from Triangles.
-        This could be achieved in the Polyhdron class.
-        //Front face
-        polygons.push_back(new Triangle(frontLeft,frontLeft + right(d),frontLeft
-   + up(d),mat));
-        polygons.push_back(new
-   Triangle(frontLeft+right(d),frontLeft+right(d)+up(d),frontLeft+up(d),mat));
-        //Left face
-        polygons.push_back(new Triangle(frontLeft, frontLeft + far(d) +
-   up(d),frontLeft + far(d),mat));
-        polygons.push_back(new Triangle(frontLeft,frontLeft + up(d),frontLeft +
-   far(d) + up(d),mat));
-        //Back face
-        polygons.push_back(new Triangle(backRight, backRight + left(d) +
-   down(d),backRight + left(d),mat));
-        polygons.push_back(new Triangle(backRight,backRight + down(d), backRight
-   + down(d) + left(d),mat));
-        //Right face
-        polygons.push_back(new Triangle(backRight, backRight + down(d) +
-   near(d),backRight + down(d),mat));
-        polygons.push_back(new Triangle(backRight,backRight + near(d), backRight
-   + down(d) + near(d),mat));
-        //Top face
-        polygons.push_back(new Triangle(backRight,backRight + left(d), backRight
-   + left(d) + near(d),mat));
-        polygons.push_back(new Triangle(backRight, backRight + near(d) +
-   left(d),backRight + near(d),mat));
-        //Bottom face
-        polygons.push_back(new Triangle(frontLeft,frontLeft + far(d),frontLeft +
-   far(d) + right(d),mat));
-        polygons.push_back(new Triangle(frontLeft, frontLeft + right(d) +
-   far(d),frontLeft + right(d),mat));
-        */

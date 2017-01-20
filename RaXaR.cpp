@@ -138,9 +138,9 @@ int main() {
         for (float fragmenty = y; fragmenty < y + 1.0f; fragmenty += 0.5f) {
           double coef = 0.25;
 #else
-          float fragmentx = x;
-          float fragmenty = y;
-          double coef = 1.0;
+      float fragmentx = x;
+      float fragmenty = y;
+      double coef = 1.0;
 #endif
 
 #ifdef JITTER_AA
@@ -213,50 +213,13 @@ int main() {
                 }
               }
 
-              double u = 0.0;
-              double v = 0.0;
+              // Colour at this intersection
+              Colour hitColour = shape->getColour(
+                  hit, normal, light, -ray.directionV(), isShadowed);
 
-              // UV Calculation
-              // http://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
-              if (shape->isSphere() && shape->getMaterial().isTex()) {
-                // This calculates the uv coordinates for a sphere
-                // First we take three vectors
-                Vector3 vn =
-                    Vector3(0, 1, 0); // unit vector pointing up (vertical axis)
-                Vector3 ve = Vector3(
-                    1, 0, 0); // unit vector pointing left (horizontal axis)
-                Vector3 vp = unit(hit - shape->getPoint()); // unit vector from
-                                                            // center to hit
-                                                            // point (hit axis)
-
-                // Inverse cosine of dot(vn,vp) gives us the angle
-                // between the vertical axis and the hit axis
-                // this is our latitude
-                double phi = acos(-dot(vn, vp));
-
-                // Vary v between zero and one (divide by half a circle)
-                v = phi / PI;
-
-                // Find the longitude, using the latitude
-                double theta = (acos(dot(vp, ve) / sin(phi)) / (2 * PI));
-                if (dot(cross(vn, ve), vp) > 0) {
-                  u = theta;
-                } else {
-                  u = 1 - theta;
-                }
-
-              } else {          // Plane along xz
-                u = hit.getX(); // / sqrt(pow(hit.getX(),2) + pow(hit.getY(),2)
-                                // + pow(hit.getZ(),2));
-                v = hit.getZ(); // / sqrt(pow(hit.getX(),2) + pow(hit.getY(),2)
-                                // + pow(hit.getZ(),2));
-              }
-
-              // Accumulate colour values
-              colour = colour + (shape->getMaterial().lit_colour(
-                                     hit, u, v, normal, light,
-                                     -ray.directionV(), isShadowed) *
-                                 coef);
+              // Accumulate colour values multiplying by the
+              // supersampling coeffecient
+              colour = colour + (hitColour * coef);
             }
 
             // Get the next reflection coefficeint
@@ -291,6 +254,7 @@ int main() {
     std::cout << time_taken * 1000 << endl;
     return 0;
   } else {
-    return -1; // Error writing image
+    std::cout << "Error writing image" << endl;
+    return -1;
   }
 }

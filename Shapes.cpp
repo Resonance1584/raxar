@@ -26,6 +26,45 @@ double Sphere::intersect(Ray3 r) {
 
   return t;
 }
+Colour Sphere::getColour(Point3 position, Vector3 normal, Lighting *light,
+                         Vector3 inverseRay, bool isShadowed) {
+
+  double u = 0.0;
+  double v = 0.0;
+
+  if (this->material.isTex()) {
+    // UV Calculation
+    // http://www.cs.unc.edu/~rademach/xroads-RT/RTarticle.html
+
+    // This calculates the uv coordinates for a sphere
+    // First we take three vectors
+    // unit vector pointing up (vertical axis)
+    Vector3 vn = Vector3(0, 1, 0);
+    // unit vector pointing left (horizontal axis)
+    Vector3 ve = Vector3(1, 0, 0);
+    // unit vector from center to hit point (hit axis)
+    Vector3 vp = unit(position - this->getPoint());
+
+    // Inverse cosine of dot(vn,vp) gives us the angle
+    // between the vertical axis and the hit axis
+    // this is our latitude
+    double phi = acos(-dot(vn, vp));
+
+    // Vary v between zero and one (divide by half a circle)
+    v = phi / PI;
+
+    // Find the longitude, using the latitude
+    double theta = (acos(dot(vp, ve) / sin(phi)) / (2 * PI));
+    if (dot(cross(vn, ve), vp) > 0) {
+      u = theta;
+    } else {
+      u = 1 - theta;
+    }
+  }
+
+  return this->material.lit_colour(position, u, v, normal, light, inverseRay,
+                                   isShadowed);
+}
 
 Plane::Plane(Point3 point, Vector3 normal, Material mat) {
   this->point = point;
@@ -42,8 +81,13 @@ double Plane::intersect(Ray3 r) {
 
   return t;
 }
-
 Point3 Plane::getPoint() { return point; }
+Colour Plane::getColour(Point3 position, Vector3 normal, Lighting *light,
+                        Vector3 inverseRay, bool isShadowed) {
+  // TODO: Allow for planes along arbitrary axis
+  return this->material.lit_colour(position, position.getX(), position.getZ(),
+                                   normal, light, inverseRay, isShadowed);
+}
 
 Triangle::Triangle(Point3 p1, Point3 p2, Point3 p3, Material mat) {
   this->point1 = p1;
@@ -58,9 +102,7 @@ Triangle::Triangle(Point3 p1, Point3 p2, Point3 p3, Material mat) {
   // Note that the material field of plane is not used
   this->internalPlane = Plane(p1, norm, mat);
 }
-
 Vector3 Triangle::normal(Point3 p) { return this->internalPlane.normal(p); }
-
 /*
  * This intersect method uses Barycentric coordinates to
  * test if a point is inside our triangle.
@@ -101,8 +143,13 @@ double Triangle::intersect(Ray3 r) {
 
   return -1;
 }
-
 Point3 Triangle::getPoint() { return this->point1; }
+Colour Triangle::getColour(Point3 position, Vector3 normal, Lighting *light,
+                           Vector3 inverseRay, bool isShadowed) {
+  // TODO: Allow for textured triangles
+  return this->material.lit_colour(position, 0.0, 0.0, normal, light,
+                                   inverseRay, isShadowed);
+}
 
 /*
  * Square
@@ -119,9 +166,7 @@ Square::Square(Point3 point1, Point3 point2, Vector3 direction, Material mat) {
 
   this->internalPlane = Plane(point1, unit(direction), mat);
 }
-
 Vector3 Square::normal(Point3 p) { return this->internalPlane.normal(p); }
-
 /*
  * This intersection uses simple bounds checking to test
  * if a point is inside our square
@@ -148,8 +193,13 @@ double Square::intersect(Ray3 r) {
 
   return -1;
 }
-
 Point3 Square::getPoint() { return internalPlane.getPoint(); }
+Colour Square::getColour(Point3 position, Vector3 normal, Lighting *light,
+                         Vector3 inverseRay, bool isShadowed) {
+  // TODO: Allow for textured triangles
+  return this->material.lit_colour(position, 0.0, 0.0, normal, light,
+                                   inverseRay, isShadowed);
+}
 
 Cube::Cube(Point3 p, double size, Material mat) {
   this->origin = p;
@@ -187,9 +237,7 @@ Cube::Cube(Point3 p, double size, Material mat) {
 
   lastHit = squares.front();
 }
-
 Vector3 Cube::normal(Point3 p) { return lastHit->normal(p); }
-
 /*
  * Checks each square for an intersection
  * Returns best hit or -1
@@ -199,10 +247,6 @@ double Cube::intersect(Ray3 r) {
 
   // We can stop checking if we have intersected two polygons
   int hits = 0;
-
-  // Shuffle order that polygons are checked in to improve performance
-  // random_shuffle(polygons.begin(),polygons.end());
-  // nope, all those swaps made it take longer
 
   for (vector<Square *>::iterator it = squares.begin(); it != squares.end();
        it++) {
@@ -220,7 +264,6 @@ double Cube::intersect(Ray3 r) {
   }
   return best;
 }
-
 /*
  * Removes (culls) any faces of the cube that are not visible
  * from the current position. Needs to be called during scene
@@ -241,6 +284,12 @@ void Cube::removeBackFaces(Point3 eyePoint) {
 
   this->squares = culledPolys;
 }
+Colour Cube::getColour(Point3 position, Vector3 normal, Lighting *light,
+                       Vector3 inverseRay, bool isShadowed) {
+  // TODO: Allow for textured triangles
+  return this->material.lit_colour(position, 0.0, 0.0, normal, light,
+                                   inverseRay, isShadowed);
+}
 
 Polyhedron::Polyhedron(vector<Triangle *> polygons, Material mat) {
 
@@ -249,9 +298,7 @@ Polyhedron::Polyhedron(vector<Triangle *> polygons, Material mat) {
 
   this->lastHit = polys.front();
 }
-
 Vector3 Polyhedron::normal(Point3 p) { return lastHit->normal(p); }
-
 /*
  * Checks each triangle for intersection
  * returns best hit or -1
@@ -272,7 +319,6 @@ double Polyhedron::intersect(Ray3 r) {
   }
   return best;
 }
-
 /*
  * Same as cube removeBackFaces
  */
@@ -289,4 +335,10 @@ void Polyhedron::removeBackFaces(Point3 eyePoint) {
   }
 
   this->polys = culledPolys;
+}
+Colour Polyhedron::getColour(Point3 position, Vector3 normal, Lighting *light,
+                             Vector3 inverseRay, bool isShadowed) {
+  // TODO: Allow for textured triangles
+  return this->material.lit_colour(position, 0.0, 0.0, normal, light,
+                                   inverseRay, isShadowed);
 }
