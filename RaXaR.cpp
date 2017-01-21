@@ -11,7 +11,6 @@
 #include "TGAReader.h"
 #include "TGAWriter.h"
 #include "View.h"
-#include "pi.h"
 
 #include <list>
 #include <vector>
