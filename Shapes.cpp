@@ -77,6 +77,11 @@ double Plane::intersect(Ray3 r) {
   double top = dot((point - r.startP()), norm);
   double bot = dot(r.directionV(), norm);
 
+  // Ray is parallel with Plane
+  if (bot == 0) {
+    return -1;
+  }
+
   t = top / bot;
 
   return t;
